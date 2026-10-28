@@ -139,5 +139,25 @@ Avoid `docker compose down -v` unless you intend to delete the stored monitoring
 - Node Exporter uses host PID access and a read-only host filesystem mount.
 - Node Exporter remains on the internal Compose network; port 9100 is not published.
 - Network metrics currently reflect the exporter's container network namespace.
-- Alert rules and external notifications have not yet been configured.
+- External alert notifications have not been configured.
 - The dashboard JSON alone does not provision the data source automatically.
+
+## Alert validation
+
+A Grafana-managed rule, `Node Exporter Down`, evaluates
+`up{job="node"} < 1` every 30 seconds with a one-minute pending period.
+
+The failure and recovery test was completed:
+
+1. Stop the exporter: `docker compose stop node-exporter`
+2. Confirm the alert transitions to Firing.
+3. Restore the exporter: `docker compose start node-exporter`
+4. Confirm the alert returns to Normal.
+
+The exported rule is stored in `alerts/node-exporter-down.yaml`.
+It references the original Prometheus data source UID; adapt that UID
+before provisioning it in another Grafana instance. The current Compose
+configuration does not automatically load this file.
+
+Alert state transitions were verified in Grafana. External notifications
+are not configured.

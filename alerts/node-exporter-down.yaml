@@ -1,0 +1,58 @@
+apiVersion: 1
+groups:
+    - orgId: 1
+      name: monitoring
+      folder: Monitoring Lab
+      interval: 30s
+      rules:
+        - uid: cg2hjwa86ky68c
+          title: Node Exporter Down
+          condition: C
+          data:
+            - refId: A
+              relativeTimeRange:
+                from: 600
+                to: 0
+              datasourceUid: fg2hhjx5kywaob
+              model:
+                editorMode: code
+                expr: up{job="node"}
+                instant: true
+                intervalMs: 1000
+                legendFormat: __auto
+                maxDataPoints: 43200
+                range: false
+                refId: A
+            - refId: C
+              queryType: expression
+              datasourceUid: __expr__
+              model:
+                conditions:
+                    - evaluator:
+                        params:
+                            - 1
+                        type: lt
+                      operator:
+                        type: and
+                      query:
+                        params:
+                            - C
+                      reducer:
+                        params: []
+                        type: last
+                      type: query
+                datasource:
+                    type: __expr__
+                    uid: __expr__
+                expression: A
+                intervalMs: 1000
+                maxDataPoints: 43200
+                refId: C
+                type: threshold
+          noDataState: NoData
+          execErrState: Error
+          for: 1m
+          annotations:
+            summary: Node Exporter is unreachable for more than 1 minute
+          labels: {}
+          isPaused: false
